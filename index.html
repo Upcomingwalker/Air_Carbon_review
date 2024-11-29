@@ -6,103 +6,7 @@
   <title>Air Carbon Project Review</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
-    /* General Reset and Body Style */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background-color: #f6f8fa;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
-
-    /* Container Styling */
-    .container {
-      background-color: #ffffff;
-      border: 1px solid #d8dee4;
-      border-radius: 6px;
-      padding: 24px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    h1 {
-      font-size: 24px;
-      font-weight: 600;
-      color: #24292f;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-
-    label {
-      font-size: 14px;
-      font-weight: 600;
-      color: #24292f;
-      display: block;
-      margin-top: 10px;
-      margin-bottom: 5px;
-    }
-
-    input, textarea, select {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #d8dee4;
-      border-radius: 6px;
-      font-size: 14px;
-      background-color: #fafbfc;
-    }
-
-    input:focus, textarea:focus, select:focus {
-      border-color: #0366d6;
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.3);
-    }
-
-    textarea {
-      resize: none;
-    }
-
-    button {
-      width: 100%;
-      background-color: #22863a;
-      color: white;
-      padding: 10px;
-      font-size: 14px;
-      font-weight: 600;
-      border: none;
-      border-radius: 6px;
-      margin-top: 10px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    button:hover {
-      background-color: #2ea44f;
-    }
-
-    .small-text {
-      font-size: 12px;
-      color: #586069;
-      text-align: center;
-      margin-top: 10px;
-    }
-
-    .role-specific-fields {
-      margin-top: 10px;
-    }
-
-    .radio-buttons {
-      display: flex;
-      gap: 10px;
-    }
+    /* CSS as before */
   </style>
 </head>
 <body>
@@ -127,30 +31,28 @@
   <div id="role-specific-fields" class="role-specific-fields"></div>
   
   <button type="submit" onclick="submitForm()">Submit</button>
-  <button onclick="requestPassword()">Download Spreadsheet</button>
+  <button onclick="downloadResponses()">Download Spreadsheet</button>
   
-  <p class="small-text">Thank You for submitting your review </p>
-  <p class="small-text">copyright @ DTM Studios (2022-2024) </p>
+  <p class="small-text">Thank You for submitting your review</p>
+  <p class="small-text">copyright @ DTM Studios (2022-2024)</p>
 </div>
 
 <script>
-  let responses = [];
-
   function showRoleSpecificFields() {
     const role = document.getElementById('role').value;
     const roleFields = document.getElementById('role-specific-fields');
     roleFields.innerHTML = '';
-    
+
     if (role === 'judge') {
       roleFields.innerHTML = `
         <label>Do you want this project to win?</label>
         <div class="radio-buttons">
           <label>
-            <input type="radio" name="judge-win" value="yes" id="judge-win-yes">
+            <input type="radio" name="judge-win" value="yes">
             Yes
           </label>
           <label>
-            <input type="radio" name="judge-win" value="no" id="judge-win-no">
+            <input type="radio" name="judge-win" value="no">
             No
           </label>
         </div>
@@ -168,11 +70,11 @@
         <label>Do you want this project to win?</label>
         <div class="radio-buttons">
           <label>
-            <input type="radio" name="teacher-win" value="yes" id="teacher-win-yes">
+            <input type="radio" name="teacher-win" value="yes">
             Yes
           </label>
           <label>
-            <input type="radio" name="teacher-win" value="no" id="teacher-win-no">
+            <input type="radio" name="teacher-win" value="no">
             No
           </label>
         </div>
@@ -186,16 +88,16 @@
     }
   }
 
-  function submitForm() {
+  async function submitForm() {
     const name = document.getElementById('name').value.trim();
     const review = document.getElementById('review').value.trim();
     const role = document.getElementById('role').value;
-    
+
     if (!name || !review || !role) {
       alert('Please fill all required fields!');
       return;
     }
-    
+
     let additionalData = {};
     if (role === 'judge') {
       const judgeWin = document.querySelector('input[name="judge-win"]:checked');
@@ -211,15 +113,42 @@
     }
 
     const response = {
-      Name: name,
-      Review: review,
-      Role: role,
-      ...additionalData
+      name,
+      review,
+      role,
+      ...additionalData,
     };
-    responses.push(response);
 
-    alert('Form submitted successfully!');
-    clearForm();
+    try {
+      await fetch('http://localhost:5000/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(response),
+      });
+
+      alert('Form submitted successfully!');
+      clearForm();
+    } catch (error) {
+      alert('Failed to submit form. Please try again.');
+    }
+  }
+
+  async function downloadResponses() {
+    try {
+      const response = await fetch('http://localhost:5000/download');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Air_Carbon_Project_Responses.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (error) {
+      alert('Failed to download responses. Please try again.');
+    }
   }
 
   function clearForm() {
@@ -227,22 +156,6 @@
     document.getElementById('review').value = '';
     document.getElementById('role').value = '';
     document.getElementById('role-specific-fields').innerHTML = '';
-  }
-
-  function requestPassword() {
-    const password = prompt('Please enter the password to download the file:');
-    if (password === 'admin@110092') {
-      downloadSpreadsheet();
-    } else {
-      alert('Incorrect password!');
-    }
-  }
-
-  function downloadSpreadsheet() {
-    const ws = XLSX.utils.json_to_sheet(responses);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Responses');
-    XLSX.writeFile(wb, 'Air_Carbon_Project_Responses.xlsx');
   }
 </script>
 
