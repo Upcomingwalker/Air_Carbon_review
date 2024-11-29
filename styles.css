@@ -1,0 +1,101 @@
+/* General Reset and Body Style */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #f6f8fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* Container Styling */
+.container {
+  background-color: #ffffff;
+  border: 1px solid #d8dee4;
+  border-radius: 6px;
+  padding: 24px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #24292f;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #24292f;
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #d8dee4;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #fafbfc;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #0366d6;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.3);
+}
+
+textarea {
+  resize: none;
+}
+
+button {
+  width: 100%;
+  background-color: #22863a;
+  color: white;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #2ea44f;
+}
+
+.small-text {
+  font-size: 12px;
+  color: #586069;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.role-specific-fields {
+  margin-top: 10px;
+}
+
+.radio-buttons {
+  display: flex;
+  gap: 10px;
+}
